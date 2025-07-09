@@ -7,18 +7,18 @@ import 'reflect-metadata';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Habilitar la validación de DTOs globalmente
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, // Remueve propiedades que no están definidas en el DTO
-    forbidNonWhitelisted: true, // Lanza un error si hay propiedades no permitidas
-    transform: true, // Transforma los tipos de datos según el DTO
+    whitelist: true, // Elimina propiedades que no están definidas en el DTO
+    forbidNonWhitelisted: true, // Lanza un error si hay propiedades no definidas
+    transform: true, // Transforma los tipos de datos de entrada a los tipos definidos en el DTO
   }));
 
   const config = new DocumentBuilder()
       .setTitle('API del Sistema de Tutorias')
-      .setDescription('Descripción de la API de Ejemplo')
-      .setVersion('0.1')
-      .addTag('Tutoring Requests') // Agrega tus etiquetas si las usas en los controladores
+      .setDescription('Documentación de la API REST para la gestión de tutorías académicas')
+      .setVersion('1.0')
+      .addTag('Tutoring Requests')
+      .addTag('tutorias')
       .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
