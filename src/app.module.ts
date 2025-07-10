@@ -11,6 +11,8 @@ import { TutorModule } from './tutor/tutor.module';
 import { CalificacionModule } from './calificacion/calificacion.module';
 import { CoordinadorModule } from './coordinador/coordinador.module';
 import { LogModule } from './log/log.module';
+import { LoggingModule } from './logging/logging.module';
+import { Log } from './logging/entities/log.entity';
 
 // Importa todas las entidades para TypeOrmModule.forRootAsync
 import { Usuario } from './usuario/entities/usuario.entity';
@@ -53,6 +55,7 @@ import { Log } from './log/entities/log.entity';
       Materia
     ]),
     TutoringRequestsModule,
+    LoggingModule,
     SolicitudModule,
     SesionModule,
     EstudianteModule,
@@ -61,6 +64,7 @@ import { Log } from './log/entities/log.entity';
     CalificacionModule,
     CoordinadorModule,
     LogModule,
+    LoggingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -21,6 +21,7 @@ import {
   ApiBearerAuth 
 } from '@nestjs/swagger';
 import { AppService } from './app.service';
+
 import { CreateUsuarioDto } from './usuario/dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './usuario/dto/update-usuario.dto';
 import { CreateEstudianteDto } from './estudiante/dto/create-estudiante.dto';
@@ -33,6 +34,7 @@ import { Coordinador } from './coordinador/entities/coordinador.entity';
 import { Materia } from './materia/entities/materia.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsInt, Min, Max } from 'class-validator';
+import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 
 // DTOs simplificados para el registro de usuarios por tipo
 export class RegistroEstudianteDto {
@@ -169,10 +171,41 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obtener mensaje de bienvenida' })
-  @ApiResponse({ status: 200, description: 'Mensaje de bienvenida del sistema' })
-  getHello(): string {
-    return this.appService.getHello();
+  @ApiOperation({ 
+    summary: 'Información del sistema',
+    description: 'Retorna información básica sobre el Sistema de Tutorías Académicas Universitarias'
+  })
+  @ApiOkResponse({ 
+    description: 'Información del sistema obtenida exitosamente',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { 
+          type: 'string', 
+          example: 'Sistema de Tutorías Académicas Universitarias API' 
+        },
+        version: { 
+          type: 'string', 
+          example: '1.0.0' 
+        },
+        status: { 
+          type: 'string', 
+          example: 'running' 
+        },
+        timestamp: { 
+          type: 'string', 
+          example: '2024-01-15T10:30:00Z' 
+        }
+      }
+    }
+  })
+  getHello(): object {
+    return {
+      message: 'Sistema de Tutorías Académicas Universitarias API',
+      version: '1.0.0',
+      status: 'running',
+      timestamp: new Date().toISOString()
+    };
   }
 
   @Post('registro/estudiante')

@@ -21,13 +21,50 @@ async function bootstrap() {
   }));
 
   const config = new DocumentBuilder()
-      .setTitle('Sistema de Tutorías Académicas')
-      .setDescription('API REST para la gestión de tutorías académicas universitarias')
-      .setVersion('1.0')
-      .addTag('Gestión de Usuarios')
-      .addTag('Autenticación')
-      .addTag('Tutoring Requests')
-      .addTag('tutorias')
+      .setTitle('Sistema de Tutorías Académicas Universitarias')
+      .setDescription(`
+        API REST para el Sistema de Tutorías Académicas Universitarias.
+        
+        ## Funcionalidades Principales
+        
+        ### 🔐 Autenticación y Autorización
+        - Sistema de login con JWT
+        - Roles: estudiante, tutor, coordinador
+        
+        ### 👥 Gestión de Usuarios
+        - Registro de usuarios por tipo
+        - Perfil de usuario
+        - Asignación de tutores a materias
+        
+        ### 📝 Solicitudes de Tutoría
+        - Crear solicitudes de tutoría
+        - Aceptar/rechazar solicitudes
+        - Gestión de sesiones agendadas
+        
+        ### 📊 Panel del Coordinador
+        - Visualización de todas las sesiones
+        - Filtros por tutor, materia, fecha
+        - Estadísticas de sesiones
+        
+        ### 📋 Registro de Acciones (Logging)
+        - Logging automático de todas las peticiones
+        - Programación orientada a aspectos
+        - Consulta y análisis de logs
+        
+        ## Tecnologías
+        - **Framework**: NestJS
+        - **Lenguaje**: TypeScript
+        - **ORM**: TypeORM
+        - **Base de Datos**: PostgreSQL
+        - **Documentación**: Swagger/OpenAPI
+      `)
+      .setVersion('1.0.0')
+      .addTag('Tutoring Requests', 'Gestión de solicitudes de tutoría')
+      .addTag('Logging', 'Sistema de logging y auditoría')
+      .addTag('Auth', 'Autenticación y autorización')
+      .addTag('Users', 'Gestión de usuarios')
+      .addTag('Sessions', 'Gestión de sesiones de tutoría')
+      .addTag('Coordinator', 'Panel del coordinador')
       .addBearerAuth(
         {
           type: 'http',
