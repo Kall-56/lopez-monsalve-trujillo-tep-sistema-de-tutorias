@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule} from "@nestjs/typeorm";
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-
+import { AuthModule } from './auth/auth.module';
 import { SolicitudModule } from './solicitud/solicitud.module';
 import { SesionModule } from './sesion/sesion.module';
 import { EstudianteModule } from './estudiante/estudiante.module';
@@ -29,6 +30,9 @@ import { Log } from './log/entities/log.entity';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'labs-dbservices01.ucab.edu.ve',
@@ -56,6 +60,7 @@ import { Log } from './log/entities/log.entity';
       Coordinador,
       Materia
     ]),
+    AuthModule,
     LoggingModule,
     SolicitudModule,
     SesionModule,

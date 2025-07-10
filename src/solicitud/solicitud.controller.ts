@@ -1,28 +1,41 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Query, UseGuards, Request } from '@nestjs/common';
 import { SolicitudService } from './solicitud.service';
 import { CreateSolicitudDto } from './dto/create-solicitud.dto';
 import { UpdateSolicitudDto } from './dto/update-solicitud.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { Solicitud, EstadoSolicitud } from './entities/solicitud.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('Solicitudes')
 @Controller('solicitudes')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth('JWT-auth')
 export class SolicitudController {
     constructor(private readonly solicitudService: SolicitudService) {}
 
     @Post()
+    @Roles('estudiante')
     @ApiOperation({ summary: 'Crear una nueva solicitud de tutoría' })
     @ApiResponse({ status: 201, description: 'Solicitud creada exitosamente', type: Solicitud })
     @ApiResponse({ status: 400, description: 'Datos inválidos' })
+    @ApiResponse({ status: 401, description: 'No autorizado' })
+    @ApiResponse({ status: 403, description: 'Acceso denegado - Solo estudiantes pueden crear solicitudes' })
     @ApiResponse({ status: 404, description: 'Estudiante o materia no encontrada' })
     @ApiResponse({ status: 409, description: 'Ya existe una solicitud pendiente para esta materia y fecha' })
-    async create(@Body() createSolicitudDto: CreateSolicitudDto): Promise<Solicitud> {
-        return await this.solicitudService.create(createSolicitudDto);
+    async create(@Body() createSolicitudDto: CreateSolicitudDto, @Request() req): Promise<Solicitud> {
+        // Asignar automáticamente el estudiante del usuario autenticado
+        const estudianteId = req.user.id;
+        return await this.solicitudService.create({ ...createSolicitudDto, estudiante_id: estudianteId });
     }
 
     @Get()
+    @Roles('coordinador')
     @ApiOperation({ summary: 'Obtener todas las solicitudes' })
     @ApiResponse({ status: 200, description: 'Lista de solicitudes obtenida exitosamente', type: [Solicitud] })
+    @ApiResponse({ status: 401, description: 'No autorizado' })
+    @ApiResponse({ status: 403, description: 'Acceso denegado - Solo coordinadores pueden ver todas las solicitudes' })
     async findAll(): Promise<Solicitud[]> {
         return await this.solicitudService.findAll();
     }
@@ -75,11 +88,14 @@ export class SolicitudController {
     }
 
     @Post(':id/aceptar')
+    @Roles('tutor', 'coordinador')
     @ApiOperation({ summary: 'Aceptar una solicitud (cambia estado a ACEPTADA y crea sesión)' })
     @ApiParam({ name: 'id', description: 'ID de la solicitud', type: 'number' })
     @ApiQuery({ name: 'tutorId', description: 'ID del tutor que acepta la solicitud', type: 'number' })
     @ApiResponse({ status: 200, description: 'Solicitud aceptada exitosamente', type: Solicitud })
     @ApiResponse({ status: 400, description: 'Solo se pueden aceptar solicitudes pendientes' })
+    @ApiResponse({ status: 401, description: 'No autorizado' })
+    @ApiResponse({ status: 403, description: 'Acceso denegado - Solo tutores y coordinadores pueden aceptar solicitudes' })
     @ApiResponse({ status: 404, description: 'Solicitud o tutor no encontrado' })
     async aceptarSolicitud(
         @Param('id') id: string,

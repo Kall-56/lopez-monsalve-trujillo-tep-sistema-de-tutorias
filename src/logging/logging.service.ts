@@ -17,7 +17,7 @@ export class LoggingService {
   /**
    * Crea un nuevo log en la base de datos
    * @param createLogDto - Datos del log a crear
-   * @returns El log creado
+   * @returns El log generado
    */
   async createLog(createLogDto: CreateLogDto): Promise<Log> {
     try {
@@ -37,51 +37,21 @@ export class LoggingService {
 
   /**
    * Crea un log de petición HTTP
-   * @param requestData - Datos de la petición
+   * @param data - Datos de la petición
    * @returns El log creado
    */
-  async createRequestLog(requestData: {
-    method: string;
-    endpoint: string;
-    userId?: number;
-    userRole?: string;
-    ipAddress?: string;
-    userAgent?: string;
-    requestBody?: any;
-    responseBody?: any;
-    statusCode: number;
-    responseTime: number;
-    errorMessage?: string;
-    level?: string;
-  }): Promise<Log> {
+  async createRequestLog(data: CreateLogDto) {
+    // No guardar log si no hay usuario autenticado
+    if (!data.usuario_id) {
+      return;
+    }
     try {
-      const accion = `${requestData.method} ${requestData.endpoint}`;
-      const detalles = {
-        method: requestData.method,
-        endpoint: requestData.endpoint,
-        userRole: requestData.userRole,
-        ipAddress: requestData.ipAddress,
-        userAgent: requestData.userAgent,
-        requestBody: requestData.requestBody,
-        responseBody: requestData.responseBody,
-        statusCode: requestData.statusCode,
-        responseTime: requestData.responseTime,
-        errorMessage: requestData.errorMessage,
-        level: requestData.level || 'INFO'
-      };
-
-      const log = this.logRepository.create({
-        usuario_id: requestData.userId || 1, // Usuario por defecto si no hay autenticación
-        accion,
-        detalles,
-        fecha: new Date()
-      });
-
-      const savedLog = await this.logRepository.save(log);
-      this.logger.debug(`Log created with ID: ${savedLog.id}`);
-      return savedLog;
+      const log = this.logRepository.create(data);
+      const saved = await this.logRepository.save(log);
+      this.logger.debug(`Log created with ID: ${saved.id}`);
+      return saved;
     } catch (error) {
-      this.logger.error(`Error creating request log: ${error.message}`, error.stack);
+      this.logger.error('Error creating request log:', error);
       throw new BadRequestException('Error creating request log');
     }
   }

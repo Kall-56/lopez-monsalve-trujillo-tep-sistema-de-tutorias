@@ -157,7 +157,7 @@ export class SolicitudService {
                 tutor_id: solicitud.tutor_id,
                 estudiante_id: solicitud.estudiante_id,
                 materia_id: solicitud.materia_id,
-                fecha: solicitud.fecha_solicitada.toISOString().split('T')[0],
+                fecha: (solicitud.fecha_solicitada instanceof Date ? solicitud.fecha_solicitada : new Date(solicitud.fecha_solicitada)).toISOString().split('T')[0],
                 hora: solicitud.hora_solicitada
             };
 
@@ -199,7 +199,7 @@ export class SolicitudService {
                 tutor_id: tutorId,
                 estudiante_id: solicitud.estudiante_id,
                 materia_id: solicitud.materia_id,
-                fecha: solicitud.fecha_solicitada.toISOString().split('T')[0],
+                fecha: (solicitud.fecha_solicitada instanceof Date ? solicitud.fecha_solicitada : new Date(solicitud.fecha_solicitada)).toISOString().split('T')[0],
                 hora: solicitud.hora_solicitada
             };
 

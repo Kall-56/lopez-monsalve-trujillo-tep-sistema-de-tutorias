@@ -65,17 +65,21 @@ export class LoggingInterceptor implements NestInterceptor {
 
         // Crear log de éxito usando la nueva estructura
         this.loggingService.createRequestLog({
-          method,
-          endpoint: url,
-          userId: userId ? parseInt(userId) : undefined,
-          userRole,
-          ipAddress,
-          userAgent,
-          requestBody,
-          responseBody,
-          statusCode,
-          responseTime,
-          level: logOptions.level || 'INFO',
+          usuario_id: userId,
+          accion: 'request_completed',
+          detalles: {
+            method,
+            endpoint: url,
+            statusCode,
+            userRole,
+            ipAddress,
+            userAgent,
+            requestBody,
+            responseBody,
+            responseTime,
+            level: logOptions.level || 'INFO',
+          },
+          fecha: new Date(),
         });
 
         this.logger.log(
@@ -90,17 +94,21 @@ export class LoggingInterceptor implements NestInterceptor {
 
         // Crear log de error usando la nueva estructura
         this.loggingService.createRequestLog({
-          method,
-          endpoint: url,
-          userId: userId ? parseInt(userId) : undefined,
-          userRole,
-          ipAddress,
-          userAgent,
-          requestBody,
-          statusCode,
-          responseTime,
-          errorMessage,
-          level: 'ERROR',
+          usuario_id: userId,
+          accion: 'request_failed',
+          detalles: {
+            method,
+            endpoint: url,
+            statusCode,
+            userRole,
+            ipAddress,
+            userAgent,
+            requestBody,
+            responseTime,
+            errorMessage,
+            level: 'ERROR',
+          },
+          fecha: new Date(),
         });
 
         this.logger.error(
