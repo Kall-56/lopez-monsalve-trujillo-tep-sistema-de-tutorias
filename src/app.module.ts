@@ -3,6 +3,7 @@ import { TypeOrmModule} from "@nestjs/typeorm";
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TutoringRequestsModule } from './tutoring-requests/tutoring-requests.module';
+
 import { SolicitudModule } from './solicitud/solicitud.module';
 import { SesionModule } from './sesion/sesion.module';
 import { EstudianteModule } from './estudiante/estudiante.module';
@@ -29,7 +30,7 @@ import { Log } from './log/entities/log.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'labs-dbservices01.ucab.edu.ve',
+      host: 'localhost',
       port: 5432,
       username: 'topicos',
       password: '123456',
