@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule} from "@nestjs/typeorm";
 import { TutoringRequestsModule } from './tutoring-requests/tutoring-requests.module';
+import { LoggingModule } from './logging/logging.module';
+import { Log } from './logging/entities/log.entity';
 
 @Module({
   imports: [
@@ -13,10 +15,11 @@ import { TutoringRequestsModule } from './tutoring-requests/tutoring-requests.mo
       username: 'topicos',
       password: '123456',
       database: 'ProyectoTopicos',
-      entities: [],
+      entities: [Log],
       synchronize: true,
     }),
     TutoringRequestsModule,
+    LoggingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
