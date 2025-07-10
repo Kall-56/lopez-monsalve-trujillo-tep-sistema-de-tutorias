@@ -24,6 +24,9 @@
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+```
+http://localhost:3000/swagger
+```
 
 ## Project setup
 
