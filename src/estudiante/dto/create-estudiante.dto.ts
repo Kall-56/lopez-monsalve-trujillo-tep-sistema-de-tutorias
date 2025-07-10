@@ -1,11 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, IsString, Min, Max } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Min, Max, IsEmail } from 'class-validator';
 
 export class CreateEstudianteDto {
-    @ApiProperty({ description: 'ID del usuario asociado a este estudiante', example: 1, required: true })
-    @IsInt()
+    @ApiProperty({ description: 'Nombre completo del estudiante', example: 'Juan Pérez', required: true })
+    @IsString()
     @IsNotEmpty()
-    id: number; // El ID del usuario que será estudiante
+    nombre: string;
+
+    @ApiProperty({ description: 'Correo electrónico del estudiante', example: 'juan.perez@email.com', required: true })
+    @IsEmail()
+    @IsNotEmpty()
+    correo: string;
+
+    @ApiProperty({ description: 'Contraseña del estudiante', example: 'password123', required: true })
+    @IsString()
+    @IsNotEmpty()
+    contraseña: string;
 
     @ApiProperty({ description: 'Cédula del estudiante', example: 'V-12345678', required: true })
     @IsString()

@@ -13,7 +13,7 @@ import { CalificacionModule } from './calificacion/calificacion.module';
 import { CoordinadorModule } from './coordinador/coordinador.module';
 import { LogModule } from './log/log.module';
 import { LoggingModule } from './logging/logging.module';
-import { Log } from './logging/entities/log.entity';
+
 
 // Importa todas las entidades para TypeOrmModule.forRootAsync
 import { Usuario } from './usuario/entities/usuario.entity';
@@ -25,12 +25,13 @@ import { Solicitud } from './solicitud/entities/solicitud.entity';
 import { Sesion } from './sesion/entities/sesion.entity';
 import { Calificacion } from './calificacion/entities/calificacion.entity';
 import { Log } from './log/entities/log.entity';
+import { Log as RequestLog } from './logging/entities/log.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: 'labs-dbservices01.ucab.edu.ve',
       port: 5432,
       username: 'topicos',
       password: '123456',
@@ -44,7 +45,8 @@ import { Log } from './log/entities/log.entity';
         Solicitud,
         Sesion,
         Calificacion,
-        Log
+        Log,
+        RequestLog
       ],
       synchronize: true,
     }),

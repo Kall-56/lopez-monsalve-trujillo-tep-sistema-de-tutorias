@@ -1,8 +1,17 @@
 import { PartialType, ApiProperty } from '@nestjs/swagger';
 import { CreateEstudianteDto } from './create-estudiante.dto';
-import { IsInt, IsOptional, IsString, Min, Max } from 'class-validator';
+import { IsInt, IsOptional, IsString, Min, Max, IsEmail } from 'class-validator';
 
 export class UpdateEstudianteDto extends PartialType(CreateEstudianteDto) {
+    @ApiProperty({ description: 'Nuevo nombre del estudiante', example: 'Juan Carlos Pérez', required: false })
+    @IsString()
+    @IsOptional()
+    nombre?: string;
+
+    @ApiProperty({ description: 'Nuevo correo electrónico del estudiante', example: 'juan.carlos@email.com', required: false })
+    @IsEmail()
+    @IsOptional()
+    correo?: string;
     @ApiProperty({ description: 'Nueva cédula del estudiante', example: 'V-87654321', required: false })
     @IsString()
     @IsOptional()

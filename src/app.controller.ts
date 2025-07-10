@@ -18,7 +18,8 @@ import {
   ApiBody, 
   ApiParam, 
   ApiQuery,
-  ApiBearerAuth 
+  ApiBearerAuth,
+  ApiOkResponse
 } from '@nestjs/swagger';
 import { AppService } from './app.service';
 
@@ -34,7 +35,6 @@ import { Coordinador } from './coordinador/entities/coordinador.entity';
 import { Materia } from './materia/entities/materia.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsInt, Min, Max } from 'class-validator';
-import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 
 // DTOs simplificados para el registro de usuarios por tipo
 export class RegistroEstudianteDto {
