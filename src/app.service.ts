@@ -39,11 +39,9 @@ export class AppService {
    * Registra un nuevo estudiante
    */
   async registrarEstudiante(registroDto: RegistroEstudianteDto): Promise<Estudiante> {
-    const { usuario: usuarioDto, estudiante: estudianteDto } = registroDto;
-
     // Verificar si el correo ya existe
     const usuarioExistente = await this.usuarioRepository.findOne({
-      where: { correo: usuarioDto.correo }
+      where: { correo: registroDto.correo }
     });
 
     if (usuarioExistente) {
@@ -55,7 +53,7 @@ export class AppService {
 
     // Verificar si la cédula del estudiante ya existe
     const estudianteExistente = await this.estudianteRepository.findOne({
-      where: { cedula: estudianteDto.cedula }
+      where: { cedula: registroDto.cedula }
     });
 
     if (estudianteExistente) {
@@ -67,11 +65,12 @@ export class AppService {
 
     // Encriptar contraseña
     const saltRounds = 10;
-    const contraseñaEncriptada = await bcrypt.hash(usuarioDto.contraseña, saltRounds);
+    const contraseñaEncriptada = await bcrypt.hash(registroDto.contraseña, saltRounds);
 
     // Crear el usuario
     const nuevoUsuario = this.usuarioRepository.create({
-      ...usuarioDto,
+      nombre: registroDto.nombre,
+      correo: registroDto.correo,
       contraseña: contraseñaEncriptada,
       activo: true,
       fecha_creacion: new Date()
@@ -81,8 +80,11 @@ export class AppService {
 
     // Crear el estudiante
     const nuevoEstudiante = this.estudianteRepository.create({
-      ...estudianteDto,
-      id: usuarioGuardado.id // Usar el ID del usuario creado
+      id: usuarioGuardado.id,
+      cedula: registroDto.cedula,
+      carrera: registroDto.carrera,
+      semestre: registroDto.semestre,
+      telefono: registroDto.telefono
     });
 
     const estudianteGuardado = await this.estudianteRepository.save(nuevoEstudiante);
@@ -107,11 +109,9 @@ export class AppService {
    * Registra un nuevo tutor
    */
   async registrarTutor(registroDto: RegistroTutorDto): Promise<Tutor> {
-    const { usuario: usuarioDto, tutor: tutorDto } = registroDto;
-
     // Verificar si el correo ya existe
     const usuarioExistente = await this.usuarioRepository.findOne({
-      where: { correo: usuarioDto.correo }
+      where: { correo: registroDto.correo }
     });
 
     if (usuarioExistente) {
@@ -123,7 +123,7 @@ export class AppService {
 
     // Verificar si la cédula del tutor ya existe
     const tutorExistente = await this.tutorRepository.findOne({
-      where: { cedula: tutorDto.cedula }
+      where: { cedula: registroDto.cedula }
     });
 
     if (tutorExistente) {
@@ -134,9 +134,9 @@ export class AppService {
     }
 
     // Verificar si la materia existe (si se proporciona)
-    if (tutorDto.materia_id) {
+    if (registroDto.materia_id) {
       const materia = await this.materiaRepository.findOne({
-        where: { id: tutorDto.materia_id }
+        where: { id: registroDto.materia_id }
       });
 
       if (!materia) {
@@ -149,11 +149,12 @@ export class AppService {
 
     // Encriptar contraseña
     const saltRounds = 10;
-    const contraseñaEncriptada = await bcrypt.hash(usuarioDto.contraseña, saltRounds);
+    const contraseñaEncriptada = await bcrypt.hash(registroDto.contraseña, saltRounds);
 
     // Crear el usuario
     const nuevoUsuario = this.usuarioRepository.create({
-      ...usuarioDto,
+      nombre: registroDto.nombre,
+      correo: registroDto.correo,
       contraseña: contraseñaEncriptada,
       activo: true,
       fecha_creacion: new Date()
@@ -163,8 +164,12 @@ export class AppService {
 
     // Crear el tutor
     const nuevoTutor = this.tutorRepository.create({
-      ...tutorDto,
-      id: usuarioGuardado.id // Usar el ID del usuario creado
+      id: usuarioGuardado.id,
+      cedula: registroDto.cedula,
+      profesion: registroDto.profesion,
+      experiencia: registroDto.experiencia,
+      telefono: registroDto.telefono,
+      materia_id: registroDto.materia_id
     });
 
     const tutorGuardado = await this.tutorRepository.save(nuevoTutor);
@@ -189,11 +194,9 @@ export class AppService {
    * Registra un nuevo coordinador
    */
   async registrarCoordinador(registroDto: RegistroCoordinadorDto): Promise<Coordinador> {
-    const { usuario: usuarioDto, coordinador: coordinadorDto } = registroDto;
-
     // Verificar si el correo ya existe
     const usuarioExistente = await this.usuarioRepository.findOne({
-      where: { correo: usuarioDto.correo }
+      where: { correo: registroDto.correo }
     });
 
     if (usuarioExistente) {
@@ -205,7 +208,7 @@ export class AppService {
 
     // Verificar si la cédula del coordinador ya existe
     const coordinadorExistente = await this.coordinadorRepository.findOne({
-      where: { cedula: coordinadorDto.cedula }
+      where: { cedula: registroDto.cedula }
     });
 
     if (coordinadorExistente) {
@@ -217,11 +220,12 @@ export class AppService {
 
     // Encriptar contraseña
     const saltRounds = 10;
-    const contraseñaEncriptada = await bcrypt.hash(usuarioDto.contraseña, saltRounds);
+    const contraseñaEncriptada = await bcrypt.hash(registroDto.contraseña, saltRounds);
 
     // Crear el usuario
     const nuevoUsuario = this.usuarioRepository.create({
-      ...usuarioDto,
+      nombre: registroDto.nombre,
+      correo: registroDto.correo,
       contraseña: contraseñaEncriptada,
       activo: true,
       fecha_creacion: new Date()
@@ -231,8 +235,10 @@ export class AppService {
 
     // Crear el coordinador
     const nuevoCoordinador = this.coordinadorRepository.create({
-      ...coordinadorDto,
-      id: usuarioGuardado.id // Usar el ID del usuario creado
+      id: usuarioGuardado.id,
+      cedula: registroDto.cedula,
+      departamento: registroDto.departamento,
+      extension_interna: registroDto.extension_interna
     });
 
     const coordinadorGuardado = await this.coordinadorRepository.save(nuevoCoordinador);

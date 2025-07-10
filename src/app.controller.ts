@@ -32,37 +32,134 @@ import { Tutor } from './tutor/entities/tutor.entity';
 import { Coordinador } from './coordinador/entities/coordinador.entity';
 import { Materia } from './materia/entities/materia.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsInt, Min, Max } from 'class-validator';
 
-// DTOs para el registro de usuarios por tipo
+// DTOs simplificados para el registro de usuarios por tipo
 export class RegistroEstudianteDto {
-  @ApiProperty({ description: 'Datos del usuario', type: CreateUsuarioDto })
-  usuario: CreateUsuarioDto;
+  @ApiProperty({ description: 'Nombre completo del usuario', example: 'Juan Pérez' })
+  @IsString()
+  @IsNotEmpty()
+  nombre: string;
 
-  @ApiProperty({ description: 'Datos específicos del estudiante', type: CreateEstudianteDto })
-  estudiante: CreateEstudianteDto;
+  @ApiProperty({ description: 'Correo electrónico del usuario', example: 'juan.perez@example.com' })
+  @IsEmail()
+  @IsNotEmpty()
+  correo: string;
+
+  @ApiProperty({ description: 'Contraseña del usuario', example: 'MiContraseña123' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  contraseña: string;
+
+  @ApiProperty({ description: 'Cédula del estudiante', example: 'V-12345678' })
+  @IsString()
+  @IsNotEmpty()
+  cedula: string;
+
+  @ApiProperty({ description: 'Carrera del estudiante', example: 'Ingeniería Informática', required: false })
+  @IsString()
+  @IsOptional()
+  carrera?: string;
+
+  @ApiProperty({ description: 'Semestre del estudiante', example: 5, required: false })
+  @IsInt()
+  @IsOptional()
+  @Min(1)
+  @Max(20)
+  semestre?: number;
+
+  @ApiProperty({ description: 'Teléfono del estudiante', example: '0412-1234567', required: false })
+  @IsString()
+  @IsOptional()
+  telefono?: string;
 }
 
 export class RegistroTutorDto {
-  @ApiProperty({ description: 'Datos del usuario', type: CreateUsuarioDto })
-  usuario: CreateUsuarioDto;
+  @ApiProperty({ description: 'Nombre completo del usuario', example: 'María González' })
+  @IsString()
+  @IsNotEmpty()
+  nombre: string;
 
-  @ApiProperty({ description: 'Datos específicos del tutor', type: CreateTutorDto })
-  tutor: CreateTutorDto;
+  @ApiProperty({ description: 'Correo electrónico del usuario', example: 'maria.gonzalez@example.com' })
+  @IsEmail()
+  @IsNotEmpty()
+  correo: string;
+
+  @ApiProperty({ description: 'Contraseña del usuario', example: 'TutorPass123' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  contraseña: string;
+
+  @ApiProperty({ description: 'Cédula del tutor', example: 'V-87654321' })
+  @IsString()
+  @IsNotEmpty()
+  cedula: string;
+
+  @ApiProperty({ description: 'Profesión del tutor', example: 'Ingeniero de Sistemas', required: false })
+  @IsString()
+  @IsOptional()
+  profesion?: string;
+
+  @ApiProperty({ description: 'Experiencia del tutor', example: '5 años de experiencia', required: false })
+  @IsString()
+  @IsOptional()
+  experiencia?: string;
+
+  @ApiProperty({ description: 'Teléfono del tutor', example: '0414-7654321', required: false })
+  @IsString()
+  @IsOptional()
+  telefono?: string;
+
+  @ApiProperty({ description: 'ID de la materia asignada', example: 1, required: false })
+  @IsInt()
+  @IsOptional()
+  materia_id?: number;
 }
 
 export class RegistroCoordinadorDto {
-  @ApiProperty({ description: 'Datos del usuario', type: CreateUsuarioDto })
-  usuario: CreateUsuarioDto;
+  @ApiProperty({ description: 'Nombre completo del usuario', example: 'Dr. Carlos Rodríguez' })
+  @IsString()
+  @IsNotEmpty()
+  nombre: string;
 
-  @ApiProperty({ description: 'Datos específicos del coordinador', type: CreateCoordinadorDto })
-  coordinador: CreateCoordinadorDto;
+  @ApiProperty({ description: 'Correo electrónico del usuario', example: 'carlos.rodriguez@example.com' })
+  @IsEmail()
+  @IsNotEmpty()
+  correo: string;
+
+  @ApiProperty({ description: 'Contraseña del usuario', example: 'CoordPass123' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  contraseña: string;
+
+  @ApiProperty({ description: 'Cédula del coordinador', example: 'E-98765432' })
+  @IsString()
+  @IsNotEmpty()
+  cedula: string;
+
+  @ApiProperty({ description: 'Departamento del coordinador', example: 'Ciencias Básicas', required: false })
+  @IsString()
+  @IsOptional()
+  departamento?: string;
+
+  @ApiProperty({ description: 'Extensión interna', example: '1234', required: false })
+  @IsString()
+  @IsOptional()
+  extension_interna?: string;
 }
 
 export class AsignarTutorMateriaDto {
   @ApiProperty({ description: 'ID del tutor', example: 1 })
+  @IsInt()
+  @IsNotEmpty()
   tutorId: number;
 
   @ApiProperty({ description: 'ID de la materia', example: 1 })
+  @IsInt()
+  @IsNotEmpty()
   materiaId: number;
 }
 
