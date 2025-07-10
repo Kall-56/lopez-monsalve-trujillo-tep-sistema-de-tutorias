@@ -45,6 +45,13 @@ import { Log } from './log/entities/log.entity';
       ],
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([
+      Usuario,
+      Estudiante,
+      Tutor,
+      Coordinador,
+      Materia
+    ]),
     TutoringRequestsModule,
     SolicitudModule,
     SesionModule,
