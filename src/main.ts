@@ -7,11 +7,17 @@ import 'reflect-metadata';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Habilitar la validación de DTOs globalmente
+  // Configurar CORS
+  app.enableCors({
+    origin: true, // Permite todas las origenes en desarrollo
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, // Remueve propiedades que no están definidas en el DTO
-    forbidNonWhitelisted: true, // Lanza un error si hay propiedades no permitidas
-    transform: true, // Transforma los tipos de datos según el DTO
+    whitelist: true, // Elimina propiedades que no están definidas en el DTO
+    forbidNonWhitelisted: false, // Cambiado a false para permitir propiedades adicionales
+    transform: true, // Transforma los tipos de datos de entrada a los tipos definidos en el DTO
   }));
 
   const config = new DocumentBuilder()
@@ -68,12 +74,14 @@ async function bootstrap() {
           description: 'Enter JWT token',
           in: 'header',
         },
-        'JWT-auth',
+        'JWT-auth', // This name here is important for references
       )
       .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('swagger', app, document);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
+  console.log(`🚀 Servidor corriendo en: http://localhost:${process.env.PORT ?? 3000}`);
+  console.log(`📚 Documentación Swagger en: http://localhost:${process.env.PORT ?? 3000}/api`);
 }
 bootstrap();
