@@ -27,19 +27,15 @@ async function bootstrap() {
         
         ## Funcionalidades Principales
         
-        ### 🔐 Autenticación y Autorización
-        - Sistema de login con JWT
-        - Roles: estudiante, tutor, coordinador
-        
         ### 👥 Gestión de Usuarios
-        - Registro de usuarios por tipo
-        - Perfil de usuario
+        - Registro de estudiantes, tutores y coordinadores
+        - Perfil de usuario y actualización de datos
         - Asignación de tutores a materias
         
-        ### 📝 Solicitudes de Tutoría
-        - Crear solicitudes de tutoría
-        - Aceptar/rechazar solicitudes
-        - Gestión de sesiones agendadas
+        ### 📝 Solicitudes y Sesiones
+        - Gestión de solicitudes de tutoría
+        - Creación y gestión de sesiones
+        - Calificaciones de sesiones
         
         ### 📊 Panel del Coordinador
         - Visualización de todas las sesiones
@@ -59,12 +55,10 @@ async function bootstrap() {
         - **Documentación**: Swagger/OpenAPI
       `)
       .setVersion('1.0.0')
-      .addTag('Tutoring Requests', 'Gestión de solicitudes de tutoría')
+      .addTag('Materias', 'Gestión de materias académicas')
+      .addTag('Solicitudes', 'Gestión de solicitudes de tutoría')
+      .addTag('Sesiones', 'Gestión de sesiones de tutoría')
       .addTag('Logging', 'Sistema de logging y auditoría')
-      .addTag('Auth', 'Autenticación y autorización')
-      .addTag('Users', 'Gestión de usuarios')
-      .addTag('Sessions', 'Gestión de sesiones de tutoría')
-      .addTag('Coordinator', 'Panel del coordinador')
       .addBearerAuth(
         {
           type: 'http',

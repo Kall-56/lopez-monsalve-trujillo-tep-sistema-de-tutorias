@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Session } from '../tutoring-requests/entities/session.entity';
+import { Sesion } from '../sesion/entities/sesion.entity';
 
 interface SessionFilters {
   tutor_id?: number;
@@ -13,8 +13,8 @@ interface SessionFilters {
 @Injectable()
 export class CoordinatorPannelService {
   constructor(
-    @InjectRepository(Session)
-    private readonly sessionRepository: Repository<Session>,
+    @InjectRepository(Sesion)
+    private readonly sessionRepository: Repository<Sesion>,
   ) {}
 
   /**
@@ -22,7 +22,7 @@ export class CoordinatorPannelService {
    * @param filters Filtros opcionales: tutor_id, materia_id, fecha, completada
    * @returns Lista de sesiones que cumplen con los filtros
    */
-  async findAllSessions(filters: SessionFilters): Promise<Session[]> {
+  async findAllSessions(filters: SessionFilters): Promise<Sesion[]> {
     const query = this.sessionRepository.createQueryBuilder('session');
     if (filters.tutor_id !== undefined) {
       query.andWhere('session.tutor_id = :tutor_id', { tutor_id: filters.tutor_id });

@@ -1,38 +1,18 @@
-import { IsOptional, IsString, IsEnum, IsDateString, IsUUID, IsNumber, Min, Max } from 'class-validator';
+import { IsOptional, IsString, IsDateString, IsNumber, Min, Max } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class QueryLogsDto {
-  @ApiPropertyOptional({ description: 'Filtrar por método HTTP' })
-  @IsOptional()
-  @IsString()
-  method?: string;
-
-  @ApiPropertyOptional({ description: 'Filtrar por endpoint' })
-  @IsOptional()
-  @IsString()
-  endpoint?: string;
-
   @ApiPropertyOptional({ description: 'Filtrar por ID de usuario' })
-  @IsOptional()
-  @IsUUID()
-  userId?: string;
-
-  @ApiPropertyOptional({ description: 'Filtrar por rol de usuario' })
-  @IsOptional()
-  @IsString()
-  userRole?: string;
-
-  @ApiPropertyOptional({ description: 'Filtrar por nivel de log', enum: ['INFO', 'WARN', 'ERROR', 'DEBUG'] })
-  @IsOptional()
-  @IsEnum(['INFO', 'WARN', 'ERROR', 'DEBUG'])
-  level?: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
-
-  @ApiPropertyOptional({ description: 'Filtrar por código de estado HTTP' })
   @IsOptional()
   @IsNumber()
   @Transform(({ value }) => parseInt(value))
-  statusCode?: number;
+  usuario_id?: number;
+
+  @ApiPropertyOptional({ description: 'Filtrar por acción' })
+  @IsOptional()
+  @IsString()
+  accion?: string;
 
   @ApiPropertyOptional({ description: 'Fecha de inicio para filtrar logs' })
   @IsOptional()

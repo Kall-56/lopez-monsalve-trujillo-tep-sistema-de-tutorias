@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule} from "@nestjs/typeorm";
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TutoringRequestsModule } from './tutoring-requests/tutoring-requests.module';
+
 
 import { SolicitudModule } from './solicitud/solicitud.module';
 import { SesionModule } from './sesion/sesion.module';
@@ -11,6 +11,7 @@ import { MateriaModule } from './materia/materia.module';
 import { TutorModule } from './tutor/tutor.module';
 import { CalificacionModule } from './calificacion/calificacion.module';
 import { CoordinadorModule } from './coordinador/coordinador.module';
+import { CoordinatorPannelModule } from './coordinator-pannel/coordinator-pannel.module';
 import { LogModule } from './log/log.module';
 import { LoggingModule } from './logging/logging.module';
 
@@ -25,7 +26,6 @@ import { Solicitud } from './solicitud/entities/solicitud.entity';
 import { Sesion } from './sesion/entities/sesion.entity';
 import { Calificacion } from './calificacion/entities/calificacion.entity';
 import { Log } from './log/entities/log.entity';
-import { Log as RequestLog } from './logging/entities/log.entity';
 
 @Module({
   imports: [
@@ -46,7 +46,6 @@ import { Log as RequestLog } from './logging/entities/log.entity';
         Sesion,
         Calificacion,
         Log,
-        RequestLog
       ],
       synchronize: true,
     }),
@@ -57,7 +56,6 @@ import { Log as RequestLog } from './logging/entities/log.entity';
       Coordinador,
       Materia
     ]),
-    TutoringRequestsModule,
     LoggingModule,
     SolicitudModule,
     SesionModule,
@@ -66,6 +64,7 @@ import { Log as RequestLog } from './logging/entities/log.entity';
     TutorModule,
     CalificacionModule,
     CoordinadorModule,
+    CoordinatorPannelModule,
     LogModule,
     LoggingModule,
   ],

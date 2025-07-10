@@ -1,7 +1,7 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, Like, In } from 'typeorm';
-import { Log } from './entities/log.entity';
+import { Log } from '../log/entities/log.entity';
 import { CreateLogDto } from './dto/create-log.dto';
 import { QueryLogsDto } from './dto/query-logs.dto';
 
@@ -36,6 +36,57 @@ export class LoggingService {
   }
 
   /**
+   * Crea un log de petición HTTP
+   * @param requestData - Datos de la petición
+   * @returns El log creado
+   */
+  async createRequestLog(requestData: {
+    method: string;
+    endpoint: string;
+    userId?: number;
+    userRole?: string;
+    ipAddress?: string;
+    userAgent?: string;
+    requestBody?: any;
+    responseBody?: any;
+    statusCode: number;
+    responseTime: number;
+    errorMessage?: string;
+    level?: string;
+  }): Promise<Log> {
+    try {
+      const accion = `${requestData.method} ${requestData.endpoint}`;
+      const detalles = {
+        method: requestData.method,
+        endpoint: requestData.endpoint,
+        userRole: requestData.userRole,
+        ipAddress: requestData.ipAddress,
+        userAgent: requestData.userAgent,
+        requestBody: requestData.requestBody,
+        responseBody: requestData.responseBody,
+        statusCode: requestData.statusCode,
+        responseTime: requestData.responseTime,
+        errorMessage: requestData.errorMessage,
+        level: requestData.level || 'INFO'
+      };
+
+      const log = this.logRepository.create({
+        usuario_id: requestData.userId || 1, // Usuario por defecto si no hay autenticación
+        accion,
+        detalles,
+        fecha: new Date()
+      });
+
+      const savedLog = await this.logRepository.save(log);
+      this.logger.debug(`Log created with ID: ${savedLog.id}`);
+      return savedLog;
+    } catch (error) {
+      this.logger.error(`Error creating request log: ${error.message}`, error.stack);
+      throw new BadRequestException('Error creating request log');
+    }
+  }
+
+  /**
    * Obtiene logs con filtros y paginación
    * @param queryDto - Parámetros de consulta
    * @returns Lista paginada de logs
@@ -48,33 +99,17 @@ export class LoggingService {
       // Construir query con filtros
       const whereConditions: any = {};
 
-      if (filters.method) {
-        whereConditions.method = filters.method;
+      if (filters.usuario_id) {
+        whereConditions.usuario_id = filters.usuario_id;
       }
 
-      if (filters.endpoint) {
-        whereConditions.endpoint = Like(`%${filters.endpoint}%`);
-      }
-
-      if (filters.userId) {
-        whereConditions.userId = filters.userId;
-      }
-
-      if (filters.userRole) {
-        whereConditions.userRole = filters.userRole;
-      }
-
-      if (filters.level) {
-        whereConditions.level = filters.level;
-      }
-
-      if (filters.statusCode) {
-        whereConditions.statusCode = filters.statusCode;
+      if (filters.accion) {
+        whereConditions.accion = Like(`%${filters.accion}%`);
       }
 
       // Filtros de fecha
       if (filters.startDate || filters.endDate) {
-        whereConditions.timestamp = Between(
+        whereConditions.fecha = Between(
           filters.startDate ? new Date(filters.startDate) : new Date(0),
           filters.endDate ? new Date(filters.endDate) : new Date(),
         );
@@ -82,9 +117,10 @@ export class LoggingService {
 
       const [logs, total] = await this.logRepository.findAndCount({
         where: whereConditions,
-        order: { timestamp: 'DESC' },
+        order: { fecha: 'DESC' },
         skip,
         take: limit,
+        relations: ['usuario']
       });
 
       return {
@@ -110,34 +146,29 @@ export class LoggingService {
     try {
       const totalLogs = await this.logRepository.count();
       
-      const logsByLevel = await this.logRepository
+      const logsByUsuario = await this.logRepository
         .createQueryBuilder('log')
-        .select('log.level', 'level')
+        .select('log.usuario_id', 'usuario_id')
         .addSelect('COUNT(*)', 'count')
-        .groupBy('log.level')
+        .groupBy('log.usuario_id')
         .getRawMany();
 
-      const logsByMethod = await this.logRepository
+      const logsByAccion = await this.logRepository
         .createQueryBuilder('log')
-        .select('log.method', 'method')
+        .select('log.accion', 'accion')
         .addSelect('COUNT(*)', 'count')
-        .groupBy('log.method')
+        .groupBy('log.accion')
         .getRawMany();
 
-      const averageResponseTime = await this.logRepository
+      const errorCount = await this.logRepository
         .createQueryBuilder('log')
-        .select('AVG(log.responseTime)', 'averageResponseTime')
-        .getRawOne();
-
-      const errorCount = await this.logRepository.count({
-        where: { level: 'ERROR' },
-      });
+        .where("log.detalles->>'statusCode' >= '400'")
+        .getCount();
 
       return {
         totalLogs,
-        logsByLevel,
-        logsByMethod,
-        averageResponseTime: parseFloat(averageResponseTime.averageResponseTime || '0'),
+        logsByUsuario,
+        logsByAccion,
         errorCount,
       };
     } catch (error) {
@@ -148,16 +179,17 @@ export class LoggingService {
 
   /**
    * Obtiene logs de un usuario específico
-   * @param userId - ID del usuario
+   * @param usuarioId - ID del usuario
    * @param limit - Límite de logs a retornar
    * @returns Lista de logs del usuario
    */
-  async getUserLogs(userId: string, limit: number = 50) {
+  async getUserLogs(usuarioId: number, limit: number = 50) {
     try {
       return await this.logRepository.find({
-        where: { userId },
-        order: { timestamp: 'DESC' },
+        where: { usuario_id: usuarioId },
+        order: { fecha: 'DESC' },
         take: limit,
+        relations: ['usuario']
       });
     } catch (error) {
       this.logger.error(`Error fetching user logs: ${error.message}`, error.stack);
@@ -175,7 +207,7 @@ export class LoggingService {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       const result = await this.logRepository.delete({
-        timestamp: Between(new Date(0), thirtyDaysAgo),
+        fecha: Between(new Date(0), thirtyDaysAgo),
       });
 
       this.logger.log(`Cleaned ${result.affected} old logs`);
@@ -191,25 +223,12 @@ export class LoggingService {
    * @param createLogDto - Datos a validar
    */
   private validateLogData(createLogDto: CreateLogDto): void {
-    if (!createLogDto.method || createLogDto.method.length > 10) {
-      throw new BadRequestException('Invalid HTTP method');
+    if (!createLogDto.usuario_id) {
+      throw new BadRequestException('Usuario ID is required');
     }
 
-    if (!createLogDto.endpoint || createLogDto.endpoint.length > 500) {
-      throw new BadRequestException('Invalid endpoint');
-    }
-
-    if (createLogDto.statusCode < 100 || createLogDto.statusCode > 599) {
-      throw new BadRequestException('Invalid status code');
-    }
-
-    if (createLogDto.responseTime < 0) {
-      throw new BadRequestException('Response time cannot be negative');
-    }
-
-    const validLevels = ['INFO', 'WARN', 'ERROR', 'DEBUG'];
-    if (!validLevels.includes(createLogDto.level)) {
-      throw new BadRequestException('Invalid log level');
+    if (!createLogDto.accion || createLogDto.accion.length > 255) {
+      throw new BadRequestException('Invalid action');
     }
   }
 }

@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { LoggingService } from './logging.service';
 import { QueryLogsDto } from './dto/query-logs.dto';
-import { Log } from './entities/log.entity';
+import { Log } from '../log/entities/log.entity';
 
 @ApiTags('Logging')
 @Controller('logging')
@@ -31,16 +31,12 @@ export class LoggingController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ 
     summary: 'Obtener logs con filtros y paginación',
-    description: 'Retorna una lista paginada de logs del sistema con opciones de filtrado avanzado. Permite filtrar por método HTTP, endpoint, usuario, nivel de log, código de estado y fechas.'
+    description: 'Retorna una lista paginada de logs del sistema con opciones de filtrado avanzado. Permite filtrar por usuario, acción y fechas.'
   })
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Número de página (default: 1)', example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Tamaño de página (default: 10, max: 100)', example: 20 })
-  @ApiQuery({ name: 'method', required: false, type: String, description: 'Filtrar por método HTTP', example: 'POST' })
-  @ApiQuery({ name: 'endpoint', required: false, type: String, description: 'Filtrar por endpoint', example: '/tutoring-requests' })
-  @ApiQuery({ name: 'userId', required: false, type: String, description: 'Filtrar por ID de usuario', example: '123e4567-e89b-12d3-a456-426614174000' })
-  @ApiQuery({ name: 'userRole', required: false, type: String, description: 'Filtrar por rol de usuario', example: 'student' })
-  @ApiQuery({ name: 'level', required: false, enum: ['INFO', 'WARN', 'ERROR', 'DEBUG'], description: 'Filtrar por nivel de log', example: 'ERROR' })
-  @ApiQuery({ name: 'statusCode', required: false, type: Number, description: 'Filtrar por código de estado HTTP', example: 400 })
+  @ApiQuery({ name: 'usuario_id', required: false, type: Number, description: 'Filtrar por ID de usuario', example: 1 })
+  @ApiQuery({ name: 'accion', required: false, type: String, description: 'Filtrar por acción', example: 'GET /materias' })
   @ApiQuery({ name: 'startDate', required: false, type: String, description: 'Fecha de inicio (ISO string)', example: '2024-01-01T00:00:00Z' })
   @ApiQuery({ name: 'endDate', required: false, type: String, description: 'Fecha de fin (ISO string)', example: '2024-01-31T23:59:59Z' })
   @ApiOkResponse({ 
@@ -73,7 +69,7 @@ export class LoggingController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ 
     summary: 'Obtener estadísticas de logs',
-    description: 'Retorna estadísticas agregadas de todos los logs del sistema, incluyendo conteos por nivel, método HTTP, tiempo promedio de respuesta y número de errores.'
+    description: 'Retorna estadísticas agregadas de todos los logs del sistema, incluyendo conteos por usuario, acción y número de errores.'
   })
   @ApiOkResponse({ 
     description: 'Estadísticas obtenidas exitosamente',
@@ -81,27 +77,26 @@ export class LoggingController {
       type: 'object',
       properties: {
         totalLogs: { type: 'number', example: 1000 },
-        logsByLevel: {
+        logsByUsuario: {
           type: 'array',
           items: {
             type: 'object',
             properties: {
-              level: { type: 'string', example: 'INFO' },
+              usuario_id: { type: 'number', example: 1 },
               count: { type: 'number', example: 800 }
             }
           }
         },
-        logsByMethod: {
+        logsByAccion: {
           type: 'array',
           items: {
             type: 'object',
             properties: {
-              method: { type: 'string', example: 'GET' },
+              accion: { type: 'string', example: 'GET /materias' },
               count: { type: 'number', example: 600 }
             }
           }
         },
-        averageResponseTime: { type: 'number', example: 150.5 },
         errorCount: { type: 'number', example: 50 }
       }
     }
@@ -118,9 +113,9 @@ export class LoggingController {
   })
   @ApiParam({ 
     name: 'userId', 
-    description: 'ID único del usuario',
-    type: String,
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    description: 'ID del usuario',
+    type: Number,
+    example: 1
   })
   @ApiQuery({ 
     name: 'limit', 
@@ -143,8 +138,13 @@ export class LoggingController {
       throw new BadRequestException('User ID is required');
     }
 
+    const userIdNumber = parseInt(userId);
+    if (isNaN(userIdNumber)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
     const limitValue = limit && limit > 0 && limit <= 50 ? limit : 50;
-    return this.loggingService.getUserLogs(userId, limitValue);
+    return this.loggingService.getUserLogs(userIdNumber, limitValue);
   }
 
   @Get('clean')

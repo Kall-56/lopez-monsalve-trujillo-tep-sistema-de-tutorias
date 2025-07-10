@@ -4,7 +4,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingService } from './logging.service';
 import { LoggingController } from './logging.controller';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
-import { Log } from './entities/log.entity';
+import { Log } from '../log/entities/log.entity';
 
 @Global()
 @Module({

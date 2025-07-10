@@ -63,11 +63,11 @@ export class LoggingInterceptor implements NestInterceptor {
           responseBody = this.sanitizeData(data, logOptions.excludeSensitiveFields);
         }
 
-        // Crear log de éxito
-        this.loggingService.createLog({
+        // Crear log de éxito usando la nueva estructura
+        this.loggingService.createRequestLog({
           method,
           endpoint: url,
-          userId,
+          userId: userId ? parseInt(userId) : undefined,
           userRole,
           ipAddress,
           userAgent,
@@ -88,11 +88,11 @@ export class LoggingInterceptor implements NestInterceptor {
         const statusCode = error.status || 500;
         const errorMessage = error.message || 'Internal server error';
 
-        // Crear log de error
-        this.loggingService.createLog({
+        // Crear log de error usando la nueva estructura
+        this.loggingService.createRequestLog({
           method,
           endpoint: url,
-          userId,
+          userId: userId ? parseInt(userId) : undefined,
           userRole,
           ipAddress,
           userAgent,

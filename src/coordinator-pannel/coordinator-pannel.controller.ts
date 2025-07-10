@@ -1,7 +1,7 @@
 import { Controller, Get, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { CoordinatorPannelService } from './coordinator-pannel.service';
-import { Session } from '../tutoring-requests/entities/session.entity';
+import { Sesion } from '../sesion/entities/sesion.entity';
 
 @ApiTags('Panel de Coordinador')
 @Controller('coordinator-pannel')
@@ -14,13 +14,13 @@ export class CoordinatorPannelController {
   @ApiQuery({ name: 'materia_id', required: false, type: Number, description: 'Filtrar por ID de materia' })
   @ApiQuery({ name: 'fecha', required: false, type: String, description: 'Filtrar por fecha (YYYY-MM-DD)' })
   @ApiQuery({ name: 'completada', required: false, type: Boolean, description: 'Filtrar por estado de completada' })
-  @ApiResponse({ status: 200, description: 'Lista de sesiones', type: [Session] })
+  @ApiResponse({ status: 200, description: 'Lista de sesiones', type: [Sesion] })
   async findAllSessions(
     @Query('tutor_id') tutor_id?: number,
     @Query('materia_id') materia_id?: number,
     @Query('fecha') fecha?: string,
     @Query('completada') completada?: boolean,
-  ): Promise<Session[]> {
+  ): Promise<Sesion[]> {
     try {
       const result = await this.coordinatorPannelService.findAllSessions({ tutor_id, materia_id, fecha, completada });
       // Siempre devolver un array, aunque esté vacío
